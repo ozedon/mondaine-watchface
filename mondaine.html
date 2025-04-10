@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>モンディーン</title>
+  <style>
+    canvas {
+      display: block;
+    }
+
+    body {
+      background-color: silver;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@480&display=swap" rel="stylesheet">
+  <script>
+    let ctx;
+    let h, m, s;
+
+    async function init() {
+      const canvas = document.getElementById("clock");
+      ctx = canvas.getContext("2d");
+
+      await document.fonts.load('18px Jost');
+      setInterval(tick, 1000);
+    }
+
+    function tick() {
+      const now = new Date();
+      h = now.getHours() % 12;
+      m = now.getMinutes();
+      s = now.getSeconds();
+      paint();
+    }
+
+    function drawHourHand(rotation) {
+      ctx.save();
+      ctx.translate(150, 150);
+      ctx.rotate(rotation);
+      // 影の設定
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 4;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+
+      ctx.beginPath();
+      ctx.moveTo(-9, 30);
+      ctx.lineTo(-7, -100);
+      ctx.lineTo(7, -100);
+      ctx.lineTo(9, 30);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawMinuteHand(rotation) {
+      ctx.save();
+      ctx.translate(150, 150);
+      ctx.rotate(rotation);
+      // 影の設定
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetX = 4;
+      ctx.shadowOffsetY = 4;
+
+      ctx.beginPath();
+      ctx.moveTo(-7, 30);
+      ctx.lineTo(-5, -130);
+      ctx.lineTo(5, -130);
+      ctx.lineTo(7, 30);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawSecondHand(rotation) {
+      ctx.save();
+      ctx.translate(150, 150);
+      ctx.rotate(rotation);
+      // 影の設定
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+      ctx.shadowBlur = 12
+        ;
+      ctx.shadowOffsetX = 6;
+      ctx.shadowOffsetY = 6;
+
+      ctx.beginPath();
+      ctx.moveTo(0, 40);
+      ctx.lineTo(0, -100);
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "red";
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0, -100, 10, 0, Math.PI * 2, true);
+      ctx.fillStyle = "red";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, 0, 5, 0, Math.PI * 2, true);
+      ctx.fillStyle = "red";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, 0, 2, 0, Math.PI * 2, true);
+      ctx.fillStyle = "silver";
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function paint() {
+      ctx.clearRect(0, 0, 300, 300);
+      ctx.save();
+      ctx.translate(150, 150);
+      ctx.arc(0, 0, 150, 0, Math.PI * 2, true);
+      ctx.fillStyle = "white";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.strokeStyle = "black";
+      const pitch = Math.PI * 2 / 60;
+      for (let i = 0; i < 60; i++) {
+        ctx.beginPath();
+        ctx.lineWidth = (i % 5) == 0 ? 10 : 3.75;
+        ctx.moveTo(0, (i % 5) == 0 ? -108 : -130);
+        ctx.lineTo(0, -140);
+        ctx.stroke();
+        ctx.rotate(pitch);
+      }
+      ctx.restore();
+      ctx.font = "16px 'Jost'";
+      drawTextWithSpacing(ctx, "MONDAINE", 102, 91, 1);
+      ctx.font = "9px 'Jost'";
+      ctx.fillText("SBB CFF FFS", 138, 103)
+      ctx.font = "11px 'Jost'";
+      drawTextWithSpacing(ctx, "AUTOMATIC", 115, 220, 1);
+      drawLogo();
+
+      let radH = (Math.PI * 2) / 12 * h + (Math.PI * 2) / 12 * (m / 60);
+      let radM = (Math.PI * 2) / 60 * m;
+      let radS = (Math.PI * 2) / 60 * s;
+      ctx.fillStyle = "black";
+      drawHourHand(radH);
+      drawMinuteHand(radM);
+      drawSecondHand(radS);
+    }
+
+    function drawTextWithSpacing(ctx, text, x, y, spacing) {
+      let currentX = x;
+      for (let char of text) {
+        ctx.fillText(char, currentX, y);
+        currentX += ctx.measureText(char).width + spacing;
+      }
+    }
+
+    function drawLogo() {
+      ctx.translate(110, 96);
+      ctx.fillStyle = "red";
+      ctx.fillRect(0, 0, 25, 8);
+      ctx.fill();
+      ctx.fillStyle = "white";
+      ctx.moveTo(15, -4);
+      ctx.lineTo(15 + 8, -4 + 8);
+      ctx.lineTo(15, -4 + 16);
+      ctx.lineTo(15 - 8, -4 + 8);
+      ctx.closePath();
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(15, 6);
+      ctx.arc(15, 4, 4, 0, Math.PI * 2, true);
+      ctx.fillStyle = "red";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(15 - 6, 4);
+      ctx.lineTo(15 + 6, 4);
+      ctx.moveTo(15, 4 - 4);
+      ctx.lineTo(15, 4 + 4);
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = "white";
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.rect(0, 0, 25, 8);
+      ctx.lineWidth = 0.75;
+      ctx.strokeStyle = "red";
+      ctx.stroke();
+      ctx.translate(-110, -96);
+    }
+
+  </script>
+</head>
+
+<body onload="init()">
+  <canvas width="300" height="300" id="clock"></canvas>
+</body>
